@@ -20,14 +20,14 @@ export default function RegisterPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (formData.password !== formData.confirmPassword) {
-            setError('Passwords do not match');
+            setError('Hasła nie są identyczne');
             return;
         }
         try {
             await api.register({ email: formData.email, password: formData.password });
             navigate('/login');
         } catch (err) {
-            setError('Registration failed. Please try again.');
+            setError('Rejestracja nie powiodła się. Spróbuj ponownie.');
         }
     };
 
@@ -38,8 +38,8 @@ export default function RegisterPage() {
                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-500/10 mb-4">
                         <Brain className="w-6 h-6 text-indigo-400" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white">Create Account</h2>
-                    <p className="text-slate-400 mt-2">Start your journey to better health</p>
+                    <h2 className="text-2xl font-bold text-white">Utwórz Konto</h2>
+                    <p className="text-slate-400 mt-2">Rozpocznij swoją drogę do lepszego zdrowia</p>
                 </div>
 
                 {error && (
@@ -50,7 +50,7 @@ export default function RegisterPage() {
 
                 <form onSubmit={handleSubmit}>
                     <div className="input-group">
-                        <label className="input-label" htmlFor="name">Full Name</label>
+                        <label className="input-label" htmlFor="name">Pełne Imię i Nazwisko</label>
                         <input
                             id="name"
                             type="text"
@@ -63,7 +63,7 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="input-group">
-                        <label className="input-label" htmlFor="email">Email Address</label>
+                        <label className="input-label" htmlFor="email">Adres Email</label>
                         <input
                             id="email"
                             type="email"
@@ -76,7 +76,7 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="input-group">
-                        <label className="input-label" htmlFor="password">Password</label>
+                        <label className="input-label" htmlFor="password">Hasło</label>
                         <input
                             id="password"
                             type="password"
@@ -89,7 +89,7 @@ export default function RegisterPage() {
                     </div>
 
                     <div className="input-group">
-                        <label className="input-label" htmlFor="confirmPassword">Confirm Password</label>
+                        <label className="input-label" htmlFor="confirmPassword">Potwierdź Hasło</label>
                         <input
                             id="confirmPassword"
                             type="password"
@@ -102,13 +102,13 @@ export default function RegisterPage() {
                     </div>
 
                     <button type="submit" className="btn btn-primary w-full mb-4">
-                        Create Account <ArrowRight className="ml-2 w-4 h-4" />
+                        Utwórz Konto <ArrowRight className="ml-2 w-4 h-4" />
                     </button>
 
                     <p className="text-center text-slate-400 text-sm">
-                        Already have an account?{' '}
+                        Masz już konto?{' '}
                         <Link to="/login" className="text-indigo-400 hover:text-indigo-300 font-medium">
-                            Sign in
+                            Zaloguj się
                         </Link>
                     </p>
                 </form>

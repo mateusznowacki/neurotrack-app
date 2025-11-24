@@ -12,6 +12,33 @@ const handleResponse = async (res: Response) => {
     return res.json();
 };
 
+export interface MigraineEntry {
+    id: string;
+    startTime: string;
+    endTime?: string;
+    intensity: number;
+    symptoms: string[];
+    triggers: string[];
+    medications: string[];
+    notes: string;
+    painLocations?: string[];
+    reliefMethods?: string[];
+    weatherInfo?: string;
+}
+
+export interface CreateEntryRequest {
+    intensity: number;
+    startTime: string;
+    duration: string;
+    symptoms: string[];
+    triggers: string[];
+    medications: string[];
+    notes: string;
+    painLocations?: string[];
+    reliefMethods?: string[];
+    weatherInfo?: string;
+}
+
 export const api = {
     async login(credentials: any) {
         const res = await fetch(`${API_URL}/auth/login`, {
@@ -43,7 +70,7 @@ export const api = {
         return handleResponse(res);
     },
 
-    async createEntry(entry: any) {
+    async createEntry(entry: CreateEntryRequest) {
         const token = localStorage.getItem('token');
         const res = await fetch(`${API_URL}/entries`, {
             method: 'POST',

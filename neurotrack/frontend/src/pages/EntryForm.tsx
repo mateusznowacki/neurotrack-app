@@ -16,13 +16,18 @@ export default function EntryForm() {
         symptoms: [] as string[],
         triggers: [] as string[],
         medications: [] as string[],
-        notes: ''
+        notes: '',
+        painLocations: [] as string[],
+        reliefMethods: [] as string[],
+        weatherInfo: ''
     });
 
     const symptomsList = ['Nausea', 'Vomiting', 'Light Sensitivity', 'Sound Sensitivity', 'Aura', 'Dizziness', 'Throbbing'];
     const triggersList = ['Stress', 'Lack of Sleep', 'Dehydration', 'Caffeine', 'Weather Change', 'Bright Light', 'Skipped Meal'];
+    const painLocationsList = ['Forehead', 'Temples', 'Occipital', 'Neck', 'Behind Eyes', 'Left Side', 'Right Side'];
+    const reliefMethodsList = ['Sleep', 'Dark Room', 'Cold Compress', 'Medication', 'Hydration', 'Caffeine', 'Massage'];
 
-    const handleMultiSelect = (field: 'symptoms' | 'triggers', value: string) => {
+    const handleMultiSelect = (field: 'symptoms' | 'triggers' | 'painLocations' | 'reliefMethods', value: string) => {
         setFormData(prev => ({
             ...prev,
             [field]: prev[field].includes(value)
@@ -59,11 +64,11 @@ export default function EntryForm() {
             <div className="card">
                 <div className="mb-8">
                     <h1 className="text-2xl font-bold text-white mb-2">Log Migraine Attack</h1>
-                    <p className="text-slate-400">Step {step} of 3</p>
+                    <p className="text-slate-400">Step {step} of 4</p>
                     <div className="w-full bg-slate-800 h-1 mt-4 rounded-full overflow-hidden">
                         <div
                             className="bg-indigo-500 h-full transition-all duration-300"
-                            style={{ width: `${(step / 3) * 100}%` }}
+                            style={{ width: `${(step / 4) * 100}%` }}
                         />
                     </div>
                 </div>
@@ -125,8 +130,8 @@ export default function EntryForm() {
                                         key={symptom}
                                         onClick={() => handleMultiSelect('symptoms', symptom)}
                                         className={`px-4 py-2 rounded-full text-sm transition-colors ${formData.symptoms.includes(symptom)
-                                                ? 'bg-indigo-500 text-white'
-                                                : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                                            ? 'bg-indigo-500 text-white'
+                                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                                             }`}
                                     >
                                         {symptom}
@@ -143,8 +148,8 @@ export default function EntryForm() {
                                         key={trigger}
                                         onClick={() => handleMultiSelect('triggers', trigger)}
                                         className={`px-4 py-2 rounded-full text-sm transition-colors ${formData.triggers.includes(trigger)
-                                                ? 'bg-rose-500 text-white'
-                                                : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                                            ? 'bg-rose-500 text-white'
+                                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
                                             }`}
                                     >
                                         {trigger}
@@ -167,6 +172,66 @@ export default function EntryForm() {
                 {step === 3 && (
                     <div className="space-y-6 animate-fade-in">
                         <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-3">Pain Locations</label>
+                            <div className="flex flex-wrap gap-2">
+                                {painLocationsList.map(location => (
+                                    <button
+                                        key={location}
+                                        onClick={() => handleMultiSelect('painLocations', location)}
+                                        className={`px-4 py-2 rounded-full text-sm transition-colors ${formData.painLocations.includes(location)
+                                            ? 'bg-indigo-500 text-white'
+                                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                                            }`}
+                                    >
+                                        {location}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-slate-300 mb-3">Relief Methods</label>
+                            <div className="flex flex-wrap gap-2">
+                                {reliefMethodsList.map(method => (
+                                    <button
+                                        key={method}
+                                        onClick={() => handleMultiSelect('reliefMethods', method)}
+                                        className={`px-4 py-2 rounded-full text-sm transition-colors ${formData.reliefMethods.includes(method)
+                                            ? 'bg-emerald-500 text-white'
+                                            : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                                            }`}
+                                    >
+                                        {method}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="input-label">Weather Conditions</label>
+                            <input
+                                type="text"
+                                className="input-field"
+                                placeholder="e.g., Sunny, Rainy, High Pressure"
+                                value={formData.weatherInfo}
+                                onChange={(e) => setFormData({ ...formData, weatherInfo: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="flex gap-4">
+                            <button onClick={() => setStep(2)} className="btn bg-slate-700 hover:bg-slate-600 text-white flex-1">
+                                Back
+                            </button>
+                            <button onClick={() => setStep(4)} className="btn btn-primary flex-1">
+                                Next Step
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {step === 4 && (
+                    <div className="space-y-6 animate-fade-in">
+                        <div>
                             <label className="input-label">Notes</label>
                             <textarea
                                 className="input-field min-h-[120px]"
@@ -177,7 +242,7 @@ export default function EntryForm() {
                         </div>
 
                         <div className="flex gap-4">
-                            <button onClick={() => setStep(2)} className="btn bg-slate-700 hover:bg-slate-600 text-white flex-1">
+                            <button onClick={() => setStep(3)} className="btn bg-slate-700 hover:bg-slate-600 text-white flex-1">
                                 Back
                             </button>
                             <button

@@ -37,4 +37,12 @@ public class MigraineEntry {
 
     @Column(columnDefinition = "TEXT")
     private String notes;
+
+    @ElementCollection
+    private List<String> painLocations;
+
+    @ElementCollection
+    private List<String> reliefMethods;
+
+    private String weatherInfo;
 }

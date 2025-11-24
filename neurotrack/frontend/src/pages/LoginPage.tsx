@@ -16,7 +16,7 @@ export default function LoginPage() {
             localStorage.setItem('token', data.token);
             navigate('/dashboard');
         } catch (err) {
-            setError('Invalid email or password');
+            setError('Nieprawidłowy email lub hasło');
         }
     };
 
@@ -27,8 +27,8 @@ export default function LoginPage() {
                     <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-indigo-500/10 mb-4">
                         <Brain className="w-6 h-6 text-indigo-400" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white">Welcome Back</h2>
-                    <p className="text-slate-400 mt-2">Sign in to continue tracking</p>
+                    <h2 className="text-2xl font-bold text-white">Witaj ponownie</h2>
+                    <p className="text-slate-400 mt-2">Zaloguj się, aby kontynuować śledzenie</p>
                 </div>
 
                 {error && (
@@ -39,7 +39,7 @@ export default function LoginPage() {
 
                 <form onSubmit={handleSubmit}>
                     <div className="input-group">
-                        <label className="input-label" htmlFor="email">Email Address</label>
+                        <label className="input-label" htmlFor="email">Adres Email</label>
                         <input
                             id="email"
                             type="email"
@@ -52,7 +52,7 @@ export default function LoginPage() {
                     </div>
 
                     <div className="input-group">
-                        <label className="input-label" htmlFor="password">Password</label>
+                        <label className="input-label" htmlFor="password">Hasło</label>
                         <input
                             id="password"
                             type="password"
@@ -67,19 +67,19 @@ export default function LoginPage() {
                     <div className="flex items-center justify-between mb-6 text-sm">
                         <label className="flex items-center text-slate-400 cursor-pointer">
                             <input type="checkbox" className="mr-2 rounded border-slate-600 bg-slate-700 text-indigo-500 focus:ring-indigo-500" />
-                            Remember me
+                            Zapamiętaj mnie
                         </label>
-                        <a href="#" className="text-indigo-400 hover:text-indigo-300">Forgot password?</a>
+                        <a href="#" className="text-indigo-400 hover:text-indigo-300">Nie pamiętasz hasła?</a>
                     </div>
 
                     <button type="submit" className="btn btn-primary w-full mb-4">
-                        Sign In <ArrowRight className="ml-2 w-4 h-4" />
+                        Zaloguj się <ArrowRight className="ml-2 w-4 h-4" />
                     </button>
 
                     <p className="text-center text-slate-400 text-sm">
-                        Don't have an account?{' '}
+                        Nie masz konta?{' '}
                         <Link to="/register" className="text-indigo-400 hover:text-indigo-300 font-medium">
-                            Sign up
+                            Zarejestruj się
                         </Link>
                     </p>
                 </form>

@@ -12,24 +12,24 @@ export default function LandingPage() {
                 <div className="container mx-auto max-w-5xl">
                     <div className="inline-flex items-center space-x-2 bg-white/5 backdrop-blur-lg rounded-full px-4 py-1.5 mb-8 border border-white/10">
                         <span className="flex h-2 w-2 rounded-full bg-indigo-400 animate-pulse"></span>
-                        <span className="text-sm font-medium text-indigo-200">New: Weather Integration 2.0</span>
+                        <span className="text-sm font-medium text-indigo-200">Nowość: Integracja z Pogodą 2.0</span>
                     </div>
 
                     <h1 className="text-5xl md:text-7xl font-bold mb-8 bg-clip-text text-transparent bg-gradient-to-r from-white via-indigo-200 to-indigo-400 tracking-tight leading-tight">
-                        Master Your Migraines <br className="hidden md:block" />
-                        <span className="text-indigo-500">Reclaim Your Life</span>
+                        Zapanuj nad Migreną <br className="hidden md:block" />
+                        <span className="text-indigo-500">Odzyskaj Swoje Życie</span>
                     </h1>
 
                     <p className="text-xl md:text-2xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-                        Advanced tracking, intelligent trigger analysis, and real-time weather insights to help you understand your patterns.
+                        Zaawansowane śledzenie, inteligentna analiza wyzwalaczy i informacje o pogodzie w czasie rzeczywistym, które pomogą Ci zrozumieć Twoje schematy.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link to="/register" className="btn btn-primary text-lg px-8 py-4 w-full sm:w-auto shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all">
-                            Start Tracking Free <ArrowRight className="ml-2 w-5 h-5" />
+                            Rozpocznij Za Darmo <ArrowRight className="ml-2 w-5 h-5" />
                         </Link>
                         <Link to="/login" className="btn btn-secondary text-lg px-8 py-4 w-full sm:w-auto">
-                            Log In
+                            Zaloguj się
                         </Link>
                     </div>
 
@@ -37,19 +37,19 @@ export default function LandingPage() {
                     <div className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 border-t border-white/5 pt-12">
                         <div>
                             <p className="text-3xl font-bold text-white mb-1">10k+</p>
-                            <p className="text-sm text-slate-500">Active Users</p>
+                            <p className="text-sm text-slate-500">Aktywnych Użytkowników</p>
                         </div>
                         <div>
                             <p className="text-3xl font-bold text-white mb-1">1M+</p>
-                            <p className="text-sm text-slate-500">Attacks Logged</p>
+                            <p className="text-sm text-slate-500">Zarejestrowanych Ataków</p>
                         </div>
                         <div>
                             <p className="text-3xl font-bold text-white mb-1">93%</p>
-                            <p className="text-sm text-slate-500">Trigger Accuracy</p>
+                            <p className="text-sm text-slate-500">Dokładność Wyzwalaczy</p>
                         </div>
                         <div>
                             <p className="text-3xl font-bold text-white mb-1">4.9/5</p>
-                            <p className="text-sm text-slate-500">User Rating</p>
+                            <p className="text-sm text-slate-500">Ocena Użytkowników</p>
                         </div>
                     </div>
                 </div>
@@ -59,25 +59,25 @@ export default function LandingPage() {
             <section className="py-24 bg-slate-900/50 relative">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Everything you need</h2>
-                        <p className="text-slate-400 max-w-2xl mx-auto">Comprehensive tools designed specifically for migraine sufferers.</p>
+                        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Wszystko, czego potrzebujesz</h2>
+                        <p className="text-slate-400 max-w-2xl mx-auto">Kompleksowe narzędzia zaprojektowane specjalnie dla osób cierpiących na migrenę.</p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">
                         <FeatureCard
                             icon={<Activity className="w-8 h-8 text-indigo-400" />}
-                            title="Smart Tracking"
-                            description="Log attacks in seconds with our intuitive interface designed for when you're in pain. Track intensity, symptoms, and medications."
+                            title="Inteligentne Śledzenie"
+                            description="Rejestruj ataki w kilka sekund dzięki intuicyjnemu interfejsowi zaprojektowanemu z myślą o chwilach bólu. Śledź intensywność, objawy i leki."
                         />
                         <FeatureCard
                             icon={<CloudRain className="w-8 h-8 text-blue-400" />}
-                            title="Weather Integration"
-                            description="Automatically correlate your attacks with pressure changes, humidity, and temperature shifts in your area."
+                            title="Integracja z Pogodą"
+                            description="Automatycznie powiąż swoje ataki ze zmianami ciśnienia, wilgotności i temperatury w Twojej okolicy."
                         />
                         <FeatureCard
                             icon={<Brain className="w-8 h-8 text-purple-400" />}
-                            title="Trigger Analysis"
-                            description="Identify your personal triggers with detailed analytics. Discover patterns you might have missed."
+                            title="Analiza Wyzwalaczy"
+                            description="Zidentyfikuj swoje osobiste wyzwalacze dzięki szczegółowym analizom. Odkryj wzorce, które mogłeś przeoczyć."
                         />
                     </div>
                 </div>

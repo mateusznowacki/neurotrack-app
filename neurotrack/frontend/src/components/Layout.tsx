@@ -25,8 +25,8 @@ export default function Layout() {
 
                         {/* Desktop Navigation */}
                         <div className="hidden md:flex items-center space-x-8">
-                            <Link to="/login" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Log In</Link>
-                            <Link to="/register" className="btn btn-primary text-sm py-2 px-4 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30">Get Started</Link>
+                            <Link to="/login" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Zaloguj się</Link>
+                            <Link to="/register" className="btn btn-primary text-sm py-2 px-4 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30">Rozpocznij</Link>
                         </div>
 
                         {/* Mobile Menu Button */}
@@ -48,13 +48,13 @@ export default function Layout() {
                                 to="/login"
                                 className="block px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors font-medium"
                             >
-                                Log In
+                                Zaloguj się
                             </Link>
                             <Link
                                 to="/register"
                                 className="block w-full text-center btn btn-primary py-3"
                             >
-                                Get Started
+                                Rozpocznij
                             </Link>
                         </div>
                     </div>
@@ -68,7 +68,7 @@ export default function Layout() {
             <footer className="border-t border-white/5 py-8 mt-auto bg-slate-900/50">
                 <div className="container mx-auto px-4 text-center">
                     <p className="text-slate-500 text-sm">
-                        © {new Date().getFullYear()} NeuroTrack. All rights reserved.
+                        © {new Date().getFullYear()} NeuroTrack. Wszelkie prawa zastrzeżone.
                     </p>
                 </div>
             </footer>
