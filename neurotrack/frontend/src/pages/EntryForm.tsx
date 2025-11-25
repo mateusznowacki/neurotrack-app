@@ -1,4 +1,11 @@
-const [step, setStep] = useState(1);
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, AlertCircle, Save } from 'lucide-react';
+import { api, API_URL } from '../api';
+
+export default function EntryForm() {
+    const navigate = useNavigate();
+    const [step, setStep] = useState(1);
 const [loading, setLoading] = useState(false);
 const [error, setError] = useState('');
 
@@ -257,7 +264,6 @@ return (
                             value={formData.duration}
                             onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                         />
-                    </div>
                     </div>
 
                     <div>

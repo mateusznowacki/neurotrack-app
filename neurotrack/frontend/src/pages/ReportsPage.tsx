@@ -1,10 +1,17 @@
-averageIntensity: number;
-averageDurationHours: number;
-migrainesByMonth: Record<string, number>;
-topTriggers: Record<string, number>;
-topSymptoms: Record<string, number>;
-intensityDistribution: Record<number, number>;
-migrainesByPressure: Record<string, number>;
+import React, { useState, useEffect } from 'react';
+import { Download, Activity, AlertCircle, Clock, Calendar, Thermometer } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { API_URL } from '../api';
+
+interface ReportData {
+    totalMigraines: number;
+    averageIntensity: number;
+    averageDurationHours: number;
+    migrainesByMonth: Record<string, number>;
+    topTriggers: Record<string, number>;
+    topSymptoms: Record<string, number>;
+    intensityDistribution: Record<number, number>;
+    migrainesByPressure: Record<string, number>;
 }
 
 export default function ReportsPage() {
