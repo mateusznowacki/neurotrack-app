@@ -1,43 +1,85 @@
 version: '3.8'
 
 services:
+  neurotrack-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: neurotrack-backend:latest
+    container_name: neurotrack-backend
+    restart: unless-stopped
+    expose:
+      - "8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: "prod"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/neurotrack"
+      SPRING_DATASOURCE_USERNAME: "postgres"
+      SPRING_DATASOURCE_PASSWORD: "postgres"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.neurotrack-api.rule=Host(`mobileapi.medflow.ovh`)"
+      - "traefik.http.routers.neurotrack-api.entrypoints=websecure"
+      - "traefik.http.routers.neurotrack-api.tls.certresolver=cf"
+      - "traefik.http.services.neurotrack-api.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.neurotrack-api-hsts.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.neurotrack-api-hsts.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.neurotrack-api-hsts.headers.stspreload=true"
+      - "traefik.http.routers.neurotrack-api.middlewares=neurotrack-api-hsts@docker"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - proxy
+      - neurotrack-network
+
   postgres:
     image: postgres:16-alpine
     container_name: neurotrack-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: neurotrack
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - neurotrack-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  backend:
-    build: ./backend
-    container_name: neurotrack-backend
-    ports:
-      - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/neurotrack
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-    depends_on:
-      - postgres
-    restart: always
-
-  frontend:
-    build: ./frontend
+  neurotrack-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        - VITE_API_URL=https://mobileapi.medflow.ovh
+    image: neurotrack-frontend:latest
     container_name: neurotrack-frontend
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    environment:
-      - CHOKIDAR_USEPOLLING=true
-    depends_on:
-      - backend
+    restart: unless-stopped
+    networks:
+      - proxy
+      - neurotrack-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.neurotrack.rule=Host(`mobile.medflow.ovh`)"
+      - "traefik.http.routers.neurotrack.entrypoints=websecure"
+      - "traefik.http.routers.neurotrack.tls.certresolver=cf"
+      - "traefik.http.services.neurotrack.loadbalancer.server.port=80"
+      - "traefik.http.middlewares.neurotrack-hsts.headers.stsseconds=31536000"
+      - "traefik.http.middlewares.neurotrack-hsts.headers.stsincludesubdomains=true"
+      - "traefik.http.middlewares.neurotrack-hsts.headers.stspreload=true"
+      - "traefik.http.routers.neurotrack.middlewares=neurotrack-hsts@docker"
+
+networks:
+  proxy:
+    external: true
+    name: proxy
+  neurotrack-network:
+    external: false
+    name: neurotrack-network
 
 volumes:
   postgres_data:

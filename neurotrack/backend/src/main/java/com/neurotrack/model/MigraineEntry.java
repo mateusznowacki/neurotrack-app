@@ -23,6 +23,8 @@ public class MigraineEntry {
 
     private LocalDateTime endTime;
 
+    private Integer durationMinutes;
+
     @Column(nullable = false)
     private Integer intensity;
 

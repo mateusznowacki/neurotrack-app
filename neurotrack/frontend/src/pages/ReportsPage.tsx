@@ -1,16 +1,10 @@
-import { useEffect, useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Activity, Clock, Calendar, AlertCircle, Download, Thermometer } from 'lucide-react';
-
-interface ReportData {
-    totalMigraines: number;
-    averageIntensity: number;
-    averageDurationHours: number;
-    migrainesByMonth: Record<string, number>;
-    topTriggers: Record<string, number>;
-    topSymptoms: Record<string, number>;
-    intensityDistribution: Record<number, number>;
-    migrainesByPressure: Record<string, number>;
+averageIntensity: number;
+averageDurationHours: number;
+migrainesByMonth: Record<string, number>;
+topTriggers: Record<string, number>;
+topSymptoms: Record<string, number>;
+intensityDistribution: Record<number, number>;
+migrainesByPressure: Record<string, number>;
 }
 
 export default function ReportsPage() {
@@ -21,7 +15,7 @@ export default function ReportsPage() {
         const fetchReport = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const res = await fetch('http://localhost:8080/api/reports/dashboard', {
+                const res = await fetch(`${API_URL}/reports/dashboard`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 if (res.ok) {
@@ -41,7 +35,7 @@ export default function ReportsPage() {
     const handleExport = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch('http://localhost:8080/api/reports/export', {
+            const res = await fetch(`${API_URL}/reports/export`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             if (res.ok) {
