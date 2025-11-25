@@ -1,5 +1,6 @@
-import { Activity, CloudRain, ShieldCheck, ArrowRight, Brain } from 'lucide-react';
+import { Activity, CloudRain, ArrowRight, Brain } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { ReactNode } from 'react';
 
 export default function LandingPage() {
     return (
@@ -86,7 +87,7 @@ export default function LandingPage() {
     );
 }
 
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+function FeatureCard({ icon, title, description }: { icon: ReactNode, title: string, description: string }) {
     return (
         <div className="p-8 rounded-2xl bg-slate-800/40 backdrop-blur-sm border border-white/5 hover:border-indigo-500/30 transition-all hover:-translate-y-1 hover:bg-slate-800/60 group">
             <div className="mb-6 p-4 bg-slate-900/50 rounded-xl w-fit group-hover:bg-indigo-500/10 transition-colors">
