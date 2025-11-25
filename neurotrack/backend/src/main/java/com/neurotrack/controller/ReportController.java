@@ -8,6 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping({ "/api/reports", "/reports" })
@@ -18,12 +20,20 @@ public class ReportController {
 
     @GetMapping("/dashboard")
     public ResponseEntity<ReportDTO> getDashboardReport(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
+        }
         String email = authentication.getName();
         return ResponseEntity.ok(reportService.getUserReport(email));
     }
 
     @GetMapping("/export")
     public ResponseEntity<byte[]> exportReport(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getPrincipal())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
+        }
         String email = authentication.getName();
         byte[] csvData = reportService.generateCsvReport(email);
 
