@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Save, AlertCircle } from 'lucide-react';
 import { api } from '../api';
@@ -19,13 +19,42 @@ export default function EntryForm() {
         notes: '',
         painLocations: [] as string[],
         reliefMethods: [] as string[],
-        weatherInfo: ''
+        weatherInfo: '',
+        pressure: undefined as number | undefined,
+        temperature: undefined as number | undefined
     });
 
-    const symptomsList = ['Nausea', 'Vomiting', 'Light Sensitivity', 'Sound Sensitivity', 'Aura', 'Dizziness', 'Throbbing'];
-    const triggersList = ['Stress', 'Lack of Sleep', 'Dehydration', 'Caffeine', 'Weather Change', 'Bright Light', 'Skipped Meal'];
-    const painLocationsList = ['Forehead', 'Temples', 'Occipital', 'Neck', 'Behind Eyes', 'Left Side', 'Right Side'];
-    const reliefMethodsList = ['Sleep', 'Dark Room', 'Cold Compress', 'Medication', 'Hydration', 'Caffeine', 'Massage'];
+    useEffect(() => {
+        const fetchWeather = async () => {
+            try {
+                const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject);
+                });
+                const { latitude, longitude } = pos.coords;
+                const token = localStorage.getItem('token');
+                const res = await fetch(`http://localhost:8080/api/weather/current?lat=${latitude}&lon=${longitude}`, {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setFormData(prev => ({
+                        ...prev,
+                        weatherInfo: `${data.condition}, ${data.temp}°C`,
+                        pressure: data.pressure,
+                        temperature: data.temp
+                    }));
+                }
+            } catch (e) {
+                console.error('Failed to fetch weather', e);
+            }
+        };
+        fetchWeather();
+    }, []);
+
+    const symptomsList = ['Nudności', 'Wymioty', 'Światłowstręt', 'Nadwrażliwość na dźwięk', 'Aura', 'Zawroty głowy', 'Pulsowanie', 'Zmęczenie', 'Sztywność karku', 'Zaburzenia widzenia', 'Mrowienie', 'Trudności z mową'];
+    const triggersList = ['Stres', 'Brak snu', 'Odwodnienie', 'Kofeina', 'Zmiana pogody', 'Jasne światło', 'Pominięty posiłek', 'Alkohol', 'Czekolada', 'Ser', 'Hormony', 'Wysiłek fizyczny', 'Zapachy'];
+    const painLocationsList = ['Czoło', 'Skronie', 'Potylica', 'Szyja', 'Za oczami', 'Lewa strona', 'Prawa strona', 'Czubek głowy', 'Twarz', 'Szczęka', 'Zatoki'];
+    const reliefMethodsList = ['Sen', 'Ciemny pokój', 'Zimny okład', 'Leki', 'Nawodnienie', 'Kofeina', 'Masaż', 'Medytacja', 'Joga', 'Spacer', 'Ciepły okład', 'Akupunktura'];
 
     const handleMultiSelect = (field: 'symptoms' | 'triggers' | 'painLocations' | 'reliefMethods', value: string) => {
         setFormData(prev => ({
@@ -46,7 +75,7 @@ export default function EntryForm() {
             });
             navigate('/dashboard');
         } catch (err) {
-            setError('Failed to save entry. Please try again.');
+            setError('Nie udało się zapisać wpisu. Spróbuj ponownie.');
             setLoading(false);
         }
     };
@@ -58,13 +87,13 @@ export default function EntryForm() {
                 className="flex items-center text-slate-400 hover:text-white mb-6 transition-colors"
             >
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Dashboard
+                Powrót do Panelu
             </button>
 
             <div className="card">
                 <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-white mb-2">Log Migraine Attack</h1>
-                    <p className="text-slate-400">Step {step} of 4</p>
+                    <h1 className="text-2xl font-bold text-white mb-2">Zarejestruj Atak Migreny</h1>
+                    <p className="text-slate-400">Krok {step} z 4</p>
                     <div className="w-full bg-slate-800 h-1 mt-4 rounded-full overflow-hidden">
                         <div
                             className="bg-indigo-500 h-full transition-all duration-300"
@@ -84,7 +113,7 @@ export default function EntryForm() {
                     <div className="space-y-6 animate-fade-in">
                         <div>
                             <label className="block text-sm font-medium text-slate-300 mb-2">
-                                Pain Intensity (1-10)
+                                Intensywność Bólu (1-10)
                             </label>
                             <input
                                 type="range"
@@ -95,9 +124,9 @@ export default function EntryForm() {
                                 className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500"
                             />
                             <div className="flex justify-between text-xs text-slate-500 mt-2">
-                                <span>Mild</span>
-                                <span>Moderate</span>
-                                <span>Severe</span>
+                                <span>Łagodny</span>
+                                <span>Umiarkowany</span>
+                                <span>Silny</span>
                             </div>
                             <div className="text-center mt-4">
                                 <span className="text-4xl font-bold text-indigo-400">{formData.intensity}</span>
@@ -105,7 +134,7 @@ export default function EntryForm() {
                         </div>
 
                         <div>
-                            <label className="input-label">Start Time</label>
+                            <label className="input-label">Czas Rozpoczęcia</label>
                             <input
                                 type="datetime-local"
                                 className="input-field"
@@ -115,7 +144,7 @@ export default function EntryForm() {
                         </div>
 
                         <button onClick={() => setStep(2)} className="btn btn-primary w-full">
-                            Next Step
+                            Następny Krok
                         </button>
                     </div>
                 )}
@@ -123,7 +152,7 @@ export default function EntryForm() {
                 {step === 2 && (
                     <div className="space-y-6 animate-fade-in">
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-3">Symptoms</label>
+                            <label className="block text-sm font-medium text-slate-300 mb-3">Objawy</label>
                             <div className="flex flex-wrap gap-2">
                                 {symptomsList.map(symptom => (
                                     <button
@@ -141,7 +170,7 @@ export default function EntryForm() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-3">Potential Triggers</label>
+                            <label className="block text-sm font-medium text-slate-300 mb-3">Potencjalne Wyzwalacze</label>
                             <div className="flex flex-wrap gap-2">
                                 {triggersList.map(trigger => (
                                     <button
@@ -160,10 +189,10 @@ export default function EntryForm() {
 
                         <div className="flex gap-4">
                             <button onClick={() => setStep(1)} className="btn bg-slate-700 hover:bg-slate-600 text-white flex-1">
-                                Back
+                                Wstecz
                             </button>
                             <button onClick={() => setStep(3)} className="btn btn-primary flex-1">
-                                Next Step
+                                Następny Krok
                             </button>
                         </div>
                     </div>
@@ -172,7 +201,7 @@ export default function EntryForm() {
                 {step === 3 && (
                     <div className="space-y-6 animate-fade-in">
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-3">Pain Locations</label>
+                            <label className="block text-sm font-medium text-slate-300 mb-3">Lokalizacja Bólu</label>
                             <div className="flex flex-wrap gap-2">
                                 {painLocationsList.map(location => (
                                     <button
@@ -190,7 +219,7 @@ export default function EntryForm() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-slate-300 mb-3">Relief Methods</label>
+                            <label className="block text-sm font-medium text-slate-300 mb-3">Metody Ulgowe</label>
                             <div className="flex flex-wrap gap-2">
                                 {reliefMethodsList.map(method => (
                                     <button
@@ -208,11 +237,11 @@ export default function EntryForm() {
                         </div>
 
                         <div>
-                            <label className="input-label">Weather Conditions</label>
+                            <label className="input-label">Warunki Pogodowe</label>
                             <input
                                 type="text"
                                 className="input-field"
-                                placeholder="e.g., Sunny, Rainy, High Pressure"
+                                placeholder="np. Słonecznie, Deszczowo, Wysokie ciśnienie"
                                 value={formData.weatherInfo}
                                 onChange={(e) => setFormData({ ...formData, weatherInfo: e.target.value })}
                             />
@@ -220,10 +249,10 @@ export default function EntryForm() {
 
                         <div className="flex gap-4">
                             <button onClick={() => setStep(2)} className="btn bg-slate-700 hover:bg-slate-600 text-white flex-1">
-                                Back
+                                Wstecz
                             </button>
                             <button onClick={() => setStep(4)} className="btn btn-primary flex-1">
-                                Next Step
+                                Następny Krok
                             </button>
                         </div>
                     </div>
@@ -232,10 +261,10 @@ export default function EntryForm() {
                 {step === 4 && (
                     <div className="space-y-6 animate-fade-in">
                         <div>
-                            <label className="input-label">Notes</label>
+                            <label className="input-label">Notatki</label>
                             <textarea
                                 className="input-field min-h-[120px]"
-                                placeholder="Any additional details..."
+                                placeholder="Dodatkowe szczegóły..."
                                 value={formData.notes}
                                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                             />
@@ -243,17 +272,17 @@ export default function EntryForm() {
 
                         <div className="flex gap-4">
                             <button onClick={() => setStep(3)} className="btn bg-slate-700 hover:bg-slate-600 text-white flex-1">
-                                Back
+                                Wstecz
                             </button>
                             <button
                                 onClick={handleSubmit}
                                 disabled={loading}
                                 className="btn btn-primary flex-1"
                             >
-                                {loading ? 'Saving...' : (
+                                {loading ? 'Zapisywanie...' : (
                                     <>
                                         <Save className="w-4 h-4 mr-2" />
-                                        Save Entry
+                                        Zapisz Wpis
                                     </>
                                 )}
                             </button>

@@ -7,4 +7,6 @@ import java.util.UUID;
 
 public interface MigraineEntryRepository extends JpaRepository<MigraineEntry, UUID> {
     List<MigraineEntry> findByUserIdOrderByStartTimeDesc(UUID userId);
+
+    List<MigraineEntry> findByUserOrderByStartTimeDesc(com.neurotrack.model.User user);
 }

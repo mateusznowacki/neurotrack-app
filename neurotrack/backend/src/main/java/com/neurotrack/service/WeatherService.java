@@ -1,69 +1,156 @@
 package com.neurotrack.service;
 
+import com.neurotrack.model.WeatherStation;
+import com.neurotrack.repository.WeatherStationRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import jakarta.annotation.PostConstruct;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
+@RequiredArgsConstructor
 public class WeatherService {
 
-    private final org.springframework.web.client.RestTemplate restTemplate = new org.springframework.web.client.RestTemplate();
+    private final WeatherStationRepository stationRepository;
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public Map<String, Object> getCurrentWeather(String lat, String lon) {
-        if (lat == null || lon == null) {
-            // Default to Warsaw if no location provided
-            lat = "52.2297";
-            lon = "21.0122";
-        }
+    private static final String IMGW_API_URL = "https://danepubliczne.imgw.pl/api/data/meteo/";
 
-        String url = String.format(
-                "https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
-                lat, lon);
+    @PostConstruct
+    public void init() {
+        fetchAndSaveStations();
+    }
 
+    @Scheduled(fixedRate = 900000) // 15 minutes
+    public void fetchAndSaveStations() {
         try {
-            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-            Map<String, Object> current = (Map<String, Object>) response.get("current");
+            System.out.println("Fetching weather stations from IMGW...");
+            String response = restTemplate.getForObject(IMGW_API_URL, String.class);
+            JsonNode root = objectMapper.readTree(response);
 
-            Map<String, Object> weather = new HashMap<>();
-            weather.put("temp", current.get("temperature_2m"));
-            weather.put("condition", getWeatherCondition((Integer) current.get("weather_code")));
-            weather.put("humidity", current.get("relative_humidity_2m"));
-            weather.put("pressure", current.get("surface_pressure"));
-            weather.put("location", String.format("%s, %s", lat.substring(0, 5), lon.substring(0, 5))); // Simple
-                                                                                                        // location for
-                                                                                                        // now
+            if (root.isArray()) {
+                for (JsonNode node : root) {
+                    WeatherStation station = new WeatherStation();
+                    station.setStationId(node.path("kod_stacji").asText());
+                    station.setName(node.path("nazwa_stacji").asText());
+                    station.setLatitude(node.path("lat").asDouble());
+                    station.setLongitude(node.path("lon").asDouble());
 
-            return weather;
+                    // Parse weather data
+                    if (node.has("temperatura_powietrza")) {
+                        station.setTemperature(node.path("temperatura_powietrza").asDouble());
+                    }
+                    if (node.has("wilgotnosc_wzgledna")) {
+                        station.setHumidity(node.path("wilgotnosc_wzgledna").asDouble());
+                    }
+                    if (node.has("cisnienie")) {
+                        station.setPressure(node.path("cisnienie").asDouble());
+                    } else {
+                        // Some stations don't have pressure, default to standard if missing or null
+                        station.setPressure(1013.0);
+                    }
+                    if (node.has("wiatr_srednia_predkosc")) {
+                        station.setWindSpeed(node.path("wiatr_srednia_predkosc").asDouble());
+                    }
+
+                    station.setLastUpdated(LocalDateTime.now());
+                    stationRepository.save(station);
+                }
+                System.out.println("Successfully updated " + root.size() + " weather stations.");
+            }
         } catch (Exception e) {
+            System.err.println("Error fetching IMGW data: " + e.getMessage());
             e.printStackTrace();
-            // Fallback to mock if API fails
-            Map<String, Object> fallback = new HashMap<>();
-            fallback.put("temp", 0);
-            fallback.put("condition", "Error");
-            fallback.put("humidity", 0);
-            fallback.put("pressure", 0);
-            fallback.put("location", "Error");
-            return fallback;
         }
     }
 
-    private String getWeatherCondition(Integer code) {
-        if (code == null)
-            return "Unknown";
-        if (code == 0)
-            return "Clear";
-        if (code <= 3)
-            return "Cloudy";
-        if (code <= 48)
-            return "Foggy";
-        if (code <= 67)
-            return "Rainy";
-        if (code <= 77)
-            return "Snowy";
-        if (code <= 82)
-            return "Rainy";
-        if (code <= 86)
-            return "Snowy";
-        return "Stormy";
+    public Map<String, Object> getCurrentWeather(String latStr, String lonStr) {
+        System.out.println("Received weather request for lat: " + latStr + ", lon: " + lonStr);
+        double lat = 52.2297; // Default Warsaw
+        double lon = 21.0122;
+
+        if (latStr != null && lonStr != null) {
+            try {
+                lat = Double.parseDouble(latStr);
+                lon = Double.parseDouble(lonStr);
+            } catch (NumberFormatException e) {
+                // Ignore invalid coords
+            }
+        }
+
+        List<WeatherStation> stations = stationRepository.findAll();
+
+        if (stations.isEmpty()) {
+            // Fallback if DB is empty (shouldn't happen due to PostConstruct)
+            return getFallbackWeather();
+        }
+
+        // Find nearest station
+        final double targetLat = lat;
+        final double targetLon = lon;
+
+        System.out.println("Calculating nearest station for: " + targetLat + ", " + targetLon);
+
+        WeatherStation nearest = stations.stream()
+                .min(Comparator.comparingDouble(
+                        s -> calculateDistance(targetLat, targetLon, s.getLatitude(), s.getLongitude())))
+                .orElse(stations.get(0));
+
+        double distance = calculateDistance(targetLat, targetLon, nearest.getLatitude(), nearest.getLongitude());
+        System.out.println("Nearest station found: " + nearest.getName() + " (Distance: " + distance + " km)");
+
+        Map<String, Object> weather = new HashMap<>();
+        weather.put("temp", nearest.getTemperature());
+        weather.put("humidity", nearest.getHumidity());
+        weather.put("pressure", nearest.getPressure());
+        weather.put("location", nearest.getName());
+
+        // Determine condition based on humidity/temp (IMGW doesn't provide condition
+        // code directly in this endpoint)
+        // Simple heuristic
+        String condition = "Cloudy";
+        if (nearest.getHumidity() > 90)
+            condition = "Rainy";
+        else if (nearest.getHumidity() < 40)
+            condition = "Clear";
+        else if (nearest.getHumidity() > 95 && nearest.getTemperature() < 0)
+            condition = "Snowy";
+
+        weather.put("condition", condition);
+
+        return weather;
+    }
+
+    // Haversine formula to calculate distance in km
+    private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+        final int R = 6371; // Radius of the earth in km
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                        * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    private Map<String, Object> getFallbackWeather() {
+        Map<String, Object> fallback = new HashMap<>();
+        fallback.put("temp", 20);
+        fallback.put("condition", "Cloudy");
+        fallback.put("humidity", 60);
+        fallback.put("pressure", 1013);
+        fallback.put("location", "Warsaw (Fallback)");
+        return fallback;
     }
 }

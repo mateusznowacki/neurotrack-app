@@ -15,7 +15,7 @@ public class WeatherController {
 
     private final WeatherService weatherService;
 
-    @GetMapping("/current")
+    @GetMapping(value = "/current", produces = "application/json;charset=UTF-8")
     public ResponseEntity<?> getCurrentWeather(@RequestParam(required = false) String lat,
             @RequestParam(required = false) String lon) {
         return ResponseEntity.ok(weatherService.getCurrentWeather(lat, lon));

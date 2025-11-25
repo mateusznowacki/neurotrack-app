@@ -83,9 +83,15 @@ export const api = {
         return handleResponse(res);
     },
 
-    async getWeather() {
+    async getWeather(lat?: number, lon?: number) {
         const token = localStorage.getItem('token');
-        const res = await fetch(`${API_URL}/weather/current`, {
+        const params = new URLSearchParams();
+        if (lat !== undefined && lon !== undefined) {
+            params.append('lat', lat.toString());
+            params.append('lon', lon.toString());
+        }
+        const url = `${API_URL}/weather/current${params.toString() ? `?${params.toString()}` : ''}`;
+        const res = await fetch(url, {
             headers: { Authorization: `Bearer ${token}` },
         });
         return handleResponse(res);

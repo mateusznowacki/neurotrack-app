@@ -45,4 +45,8 @@ public class MigraineEntry {
     private List<String> reliefMethods;
 
     private String weatherInfo;
+
+    private Integer pressure;
+
+    private Double temperature;
 }

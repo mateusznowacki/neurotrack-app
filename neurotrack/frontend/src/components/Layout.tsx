@@ -1,10 +1,18 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Brain, Menu, X } from 'lucide-react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Brain, Menu, X, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
 
 export default function Layout() {
+    const { isAuthenticated, logout } = useAuth();
+    const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const location = useLocation();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
 
     // Close menu when route changes
     useEffect(() => {
@@ -25,8 +33,22 @@ export default function Layout() {
 
                         {/* Desktop Navigation */}
                         <div className="hidden md:flex items-center space-x-8">
-                            <Link to="/login" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Zaloguj się</Link>
-                            <Link to="/register" className="btn btn-primary text-sm py-2 px-4 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30">Rozpocznij</Link>
+                            {isAuthenticated ? (
+                                <>
+                                    <Link to="/dashboard" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Dashboard</Link>
+                                    <Link to="/reports" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Raporty</Link>
+                                    <Link to="/log-attack" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Zaloguj Atak</Link>
+                                    <button onClick={handleLogout} className="flex items-center text-sm font-medium text-slate-300 hover:text-white transition-colors">
+                                        <LogOut className="w-4 h-4 mr-2" />
+                                        Wyloguj
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link to="/login" className="text-sm font-medium text-slate-300 hover:text-white transition-colors">Zaloguj się</Link>
+                                    <Link to="/register" className="btn btn-primary text-sm py-2 px-4 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30">Rozpocznij</Link>
+                                </>
+                            )}
                         </div>
 
                         {/* Mobile Menu Button */}
@@ -44,18 +66,49 @@ export default function Layout() {
                 <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-64 opacity-100' : 'max-h-0 opacity-0'}`}>
                     <div className="border-t border-white/5 bg-slate-900/95 backdrop-blur-xl">
                         <div className="container mx-auto px-4 py-4 space-y-3">
-                            <Link
-                                to="/login"
-                                className="block px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors font-medium"
-                            >
-                                Zaloguj się
-                            </Link>
-                            <Link
-                                to="/register"
-                                className="block w-full text-center btn btn-primary py-3"
-                            >
-                                Rozpocznij
-                            </Link>
+                            {isAuthenticated ? (
+                                <>
+                                    <Link
+                                        to="/dashboard"
+                                        className="block px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors font-medium"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                    <Link
+                                        to="/reports"
+                                        className="block px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors font-medium"
+                                    >
+                                        Raporty
+                                    </Link>
+                                    <Link
+                                        to="/log-attack"
+                                        className="block px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors font-medium"
+                                    >
+                                        Zaloguj Atak
+                                    </Link>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full text-left block px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors font-medium"
+                                    >
+                                        Wyloguj
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link
+                                        to="/login"
+                                        className="block px-4 py-3 rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors font-medium"
+                                    >
+                                        Zaloguj się
+                                    </Link>
+                                    <Link
+                                        to="/register"
+                                        className="block w-full text-center btn btn-primary py-3"
+                                    >
+                                        Rozpocznij
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

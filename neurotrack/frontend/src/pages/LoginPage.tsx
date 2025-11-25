@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Brain, ArrowRight } from 'lucide-react';
 import { api } from '../api';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -13,7 +15,7 @@ export default function LoginPage() {
         e.preventDefault();
         try {
             const data = await api.login({ email, password });
-            localStorage.setItem('token', data.token);
+            login(data.token);
             navigate('/dashboard');
         } catch (err) {
             setError('Nieprawidłowy email lub hasło');
