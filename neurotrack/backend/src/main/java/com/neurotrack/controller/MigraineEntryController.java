@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/entries")
+@RequestMapping({ "/api/entries", "/entries" })
 @RequiredArgsConstructor
 public class MigraineEntryController {
 
